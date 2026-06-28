@@ -1,0 +1,38 @@
+# Environments
+.env
+.env.local
+.venv/
+venv/
+env/
+ENV/
+bin/
+lib/
+include/
+
+# Node dependencies
+node_modules/
+npm-debug.log*
+
+# Python caches
+__pycache__/
+*.py[cod]
+*$py.class
+
+# IDE configurations
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+
+# Docker files
+.docker/
+
+# Temporary or local build files
+dist/
+build/
+out/
+bin/
+obj/

@@ -1,0 +1,9 @@
+ID,Folder,Endpoint,Method,Scenario,Input file/body,Expected status,Expected response check,Type,Pass/Fail,Evidence
+TC01,Functional,/health,GET,Service is alive,-,200,status=ok,functional,Pass,reports/newman-report-notify-mock.xml
+TC02,Functional,/events/alert.created,POST,Create alert happy path,payload (in collection),202,"has eventId, status=queued",functional,Pass,reports/newman-report-notify-mock.xml
+TC03,Auth,/events/alert.created,POST,Missing token,payload (in collection),401,Problem Details,auth,Pass,reports/newman-report-notify-mock.xml
+TC04,Negative,/events/alert.created,POST,Missing required fields,{ "eventId": "123" },422,Problem Details,negative,Pass,reports/newman-report-notify-mock.xml
+TC05,Boundary,/events/alert.created,POST,Too many channels ( > 4 ),payload (in collection),422,Problem Details/biz rule,boundary,Pass,reports/newman-report-notify-mock.xml
+TC06,Functional,/events/alert.escalated,POST,Escalated alert happy path,payload (in collection),202,status=queued,functional,Pass,reports/newman-report-notify-mock.xml
+TC07,Functional,/events/alert.resolved,POST,Resolved alert happy path,payload (in collection),202,status=queued,functional,Pass,reports/newman-report-notify-mock.xml
+TC08,Consumer-side Smoke,/events/alert.created,POST,Consumer smoke test against mock,payload (in collection),202,status=queued,smoke,Pass,reports/newman-report-notify-mock.xml

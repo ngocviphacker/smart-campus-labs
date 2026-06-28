@@ -1,0 +1,52 @@
+name: Contract + Newman (notify)
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  test-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint OpenAPI contract
+        run: npx @stoplight/spectral-cli lint lab02-ngocviphacker/openapi.yaml --ruleset lab02-ngocviphacker/campus-spectral.yaml || true
+
+      - name: Start Prism mock
+        run: |
+          nohup npm run mock:notify > prism.log 2>&1 &
+          sleep 5
+          cat prism.log
+
+      - name: Ensure Newman HTML reporter installed
+        run: npm install --no-save newman-reporter-htmlextra@^1 || true
+
+      - name: Run Newman collection (mock)
+        run: |
+          set -o pipefail || true
+          npx newman run postman/collections/team-notify.postman_collection.json -e postman/environments/team-notify_mock.postman_environment.json --reporters cli,junit,htmlextra --reporter-junit-export reports/newman-report-notify-mock.xml --reporter-htmlextra-export reports/newman-report-notify-mock.html
+        continue-on-error: false
+
+      - name: Show Prism log on failure
+        if: failure()
+        run: cat prism.log || true
+
+      - name: Upload reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: newman-reports-notify
+          path: |
+            reports/newman-report-notify-mock.xml
+            reports/newman-report-notify-mock.html
+            prism.log

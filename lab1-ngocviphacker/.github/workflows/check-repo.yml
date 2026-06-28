@@ -1,0 +1,34 @@
+name: Check student setup repo
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  structure-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check required files
+        run: |
+          test -f README.md
+          test -f scripts/pull_all.sh
+          test -f scripts/smoke_test.sh
+          test -f scripts/collect_session01_evidence.sh
+          test -f compose/docker-compose.smoke.yml
+          test -f evidence/buoi-01/README.md
+          test -f evidence/buoi-01/checklist.md
+          test -f requirements.txt
+          test -f package.json
+      - name: Shell syntax check
+        run: |
+          bash -n scripts/pull_all.sh
+          bash -n scripts/smoke_test.sh
+          bash -n scripts/collect_session01_evidence.sh
+      - name: Ensure no Word documents are committed
+        run: |
+          if find . -iname "*.doc" -o -iname "*.docx" | grep -q .; then
+            echo "Word documents are not allowed in the student repo."
+            find . -iname "*.doc" -o -iname "*.docx"
+            exit 1
+          fi
